@@ -17,8 +17,12 @@ var FancyWebSocket = function (url) {
 	this.connect = function() {
 		if (typeof(MozWebSocket) == 'function')
 			this.conn = new MozWebSocket(url);
-		else
+		else if (window['WebSocket'])
 			this.conn = new WebSocket(url);
+		else {
+			this.conn = {};
+			dispatch('close', null);
+		}
 
 		// dispatch to the right handlers
 		this.conn.onmessage = function (evt) {
