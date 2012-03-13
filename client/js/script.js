@@ -1,5 +1,16 @@
+var Server;
+
 function log (text) {
 	console.log(text);
+}
+
+function chat (msg, chat_window) {
+	var chatbox = $(chat_window);
+	chatbox.append((chatbox.val() ? "\n" : '') + msg);
+}
+
+function send (text) {
+	Server.send('message', text);
 }
 
 function setStatus (status, msg) {
@@ -38,11 +49,36 @@ $(document).ready(function () {
 	var retries = 0;
 	var max_retries = 3;
 	var connected = false;
+	var chat_window = '#chatWindow';
+	var chat_form = '#chatForm';
+	var chat_input = '#chatForm input';
+
+	function JSONtoMsg (JSON) {
+		if (typeof JSON == 'string') var data = $.parseJSON(JSON);
+		else if (typeof JSON == 'object') var data = JSON;
+		else return false;
+		
+		msg_num = $('blockquote', chat_window).length;
+		cls = msg_num % 2 == 0 ? 'left' : 'right';
+		return '<blockquote class="pull-' + cls + '"><p>' + data.msg + '</p>\n<small>' + data.author + '</small></blockquote>';
+	}
 
 	// Make the connection
 	setStatus('connecting');
 	log('Connecting...');
-	var Server = new FancyWebSocket('ws://127.0.0.1:9300');
+	Server = new FancyWebSocket('ws://127.0.0.1:9300');
+
+	// Process the user's chat messages
+	$(chat_form).submit(function (e) {
+		e.preventDefault();
+
+		var msg = $(chat_input).val();
+
+		chat(JSONtoMsg({"author":"You","msg":msg}), chat_window);
+		send(msg);
+
+		$(this).val('');
+	})
 
 	// Socket open - we're in!
 	Server.bind('open', function () {
@@ -54,6 +90,8 @@ $(document).ready(function () {
 			log('Resetting retry count...');
 			retries = 0;
 		}
+
+		chat(JSONtoMsg({author: 'The Autobots', msg: 'Enter a message below to chat.'}), chat_window);
 	});
 
 	// Aww they broke it :(
@@ -87,7 +125,7 @@ $(document).ready(function () {
 
 	// Log stuff the server sends us
 	Server.bind('message', function (payload) {
-		log(payload);
+		chat(JSONtoMsg(payload), chat_window);
 	});
 
 	Server.connect();

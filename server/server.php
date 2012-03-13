@@ -2,7 +2,7 @@
 set_time_limit(0);
 @date_default_timezone_set('Europe/London');
 
-$server_host = '127.0.0.1';
+$server_host = '192.168.1.72';//127.0.0.1';
 $server_port = 9300;
 
 require 'class.PHPWebSocket.php';
@@ -19,12 +19,15 @@ function wsOnMessage($clientID, $message, $messageLength, $binary) {
 
 	//The speaker is the only person in the room. Don't let them feel lonely.
 	if (sizeof($Server->wsClients) == 1)
-		$Server->wsSend($clientID, 'There\'s nobody here, fool!');
+		$Server->wsSend($clientID, '{"author":"The Autobots","msg":"There\'s nobody here, fool!"}');
 	else {
 		//Send the message to everyone but the person who said it
 		foreach ( $Server->wsClients as $id => $client ) {
 			if ($id == $clientID) continue;
-			$Server->wsSend($id, 'Visitor ' . $clientID . ' (' . $ip . ') said "' . $message . '"');
+			$Server->wsSend($id, json_encode(array(
+				'author' => 'User ' . $clientID,
+				'msg' => $message
+			)));
 		}
 	}
 }
@@ -39,7 +42,10 @@ function wsOnOpen($clientID) {
 	//Send a join notice to everyone but the person who joined
 	foreach ( $Server->wsClients as $id => $client ) {
 		if ($id == $clientID) continue;
-		$Server->wsSend($id, 'Visitor ' . $clientID . ' (' . $ip . ') has joined the room.');
+		$Server->wsSend($id, json_encode(array(
+			'author' => 'The Autobots',
+			'msg' => 'User ' . $clientID . ' (' . $ip . ') has joined the room.'
+		)));
 	}
 }
 
@@ -51,7 +57,10 @@ function wsOnClose($clientID, $status) {
 	$Server->log($ip . ' (' . $clientID . ') has disconnected.');
 
 	foreach ( $Server->wsClients as $id => $client ) {
-		$Server->wsSend($id, 'Visitor ' . $clientID . ' (' . $ip . ') has left the room.');
+		$Server->wsSend($id, json_encode(array(
+			'author' => 'The Autobots',
+			'msg' => 'User ' . $clientID . ' (' . $ip . ') has left the room.'
+		)));
 	}
 }
 
