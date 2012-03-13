@@ -39,9 +39,39 @@
 				</div>
 			</div>
 			<div class="row-fluid">
-				<div class="span12">
+				<div class="span8">
 					<div class="well">
 						<pre>code goes here</pre>
+					</div>
+				</div>
+				<div class="span4">
+					<h3>Live Chat</h3>
+					<blockquote class="pull-left">
+						<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do.</p>
+						<small>user1</small>
+					</blockquote>
+					<blockquote class="pull-right">
+						<p>eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+						<small>user2</small>
+					</blockquote>
+					<blockquote class="pull-left">
+						<p>LUt enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+						<small>user1</small>
+					</blockquote>
+					<blockquote class="pull-right">
+						<p>Duis aute irure dolor in reprehenderit in voluptate velit essecillum dolore eu fugiat nulla pariatur.</p>
+						<small>user3</small>
+					</blockquote>
+					<blockquote class="pull-left">
+						<p>Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+						<small>user3</small>
+					</blockquote>
+					<div class="row-fluid">
+						<div class="span12">
+							<form class="well form-search" id="chatForm">
+								<input class="search-query" type="text">
+							</form>
+						</div>
 					</div>
 				</div>
 			</div>
