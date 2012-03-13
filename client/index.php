@@ -33,15 +33,15 @@
 
 		<div class="container-fluid">
 			<div class="row-fluid">
-				<div class="span12">
+				<div class="span8">
 					<h2 class="pull-left">Untitled Paste</h2>
 					<p class="pull-right"><a class="btn btn-large" id="socket_status">offline</a></p>
-				</div>
-			</div>
-			<div class="row-fluid">
-				<div class="span8">
-					<div class="well">
-						<pre>code goes here</pre>
+					<div class="row-fluid">
+						<div class="span12">
+							<div class="well">
+								<pre>code goes here</pre>
+							</div>
+						</div>
 					</div>
 				</div>
 				<div class="span4">
