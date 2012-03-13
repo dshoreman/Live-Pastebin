@@ -77,8 +77,8 @@ $(document).ready(function () {
 		chat(JSONtoMsg({"author":"You","msg":msg}), chat_window);
 		send(msg);
 
-		$(this).val('');
-	})
+		$(chat_input).val('');
+	});
 
 	// Socket open - we're in!
 	Server.bind('open', function () {
