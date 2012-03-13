@@ -20,7 +20,7 @@ function wsOnMessage($clientID, $message, $messageLength, $binary) {
 		//Send the message to everyone but the person who said it
 		foreach ( $Server->wsClients as $id => $client ) {
 			if ($id == $clientID) continue;
-			$Server->wsSend($id, "Visitor $clientID ($ip) said \"$message\"");
+			$Server->wsSend($id, 'Visitor ' . $clientID . ' (' . $ip . ') said "' . $message . '"');
 		}
 	}
 }
