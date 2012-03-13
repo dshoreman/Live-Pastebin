@@ -1,6 +1,10 @@
 <?php
 set_time_limit(0);
 @date_default_timezone_set('Europe/London');
+
+$server_host = '127.0.0.1';
+$server_port = 9300;
+
 require 'class.PHPWebSocket.php';
 
 // when a client sends data to the server
@@ -58,4 +62,4 @@ $Server->bind('message', 'wsOnMessage');
 $Server->bind('open', 'wsOnOpen');
 $Server->bind('close', 'wsOnClose');
 
-$Server->wsStartServer('127.0.0.1', 9300);
+$Server->wsStartServer($server_host, $server_port);
