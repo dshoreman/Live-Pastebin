@@ -53,14 +53,12 @@ $(document).ready(function () {
 	var chat_form = '#chatForm';
 	var chat_input = '#chatForm input';
 
-	function JSONtoMsg (JSON) {
+	function JSONtoHTML (JSON) {
 		if (typeof JSON == 'string') var data = $.parseJSON(JSON);
 		else if (typeof JSON == 'object') var data = JSON;
 		else return false;
 		
-		msg_num = $('blockquote', chat_window).length;
-		cls = msg_num % 2 == 0 ? 'left' : 'right';
-		return '<blockquote class="pull-' + cls + '"><p>' + data.msg + '</p>\n<small>' + data.author + '</small></blockquote>';
+		return '<blockquote><p>' + data.msg + '</p>\n<small>' + data.author + '</small></blockquote>';
 	}
 
 	// Make the connection
@@ -74,7 +72,7 @@ $(document).ready(function () {
 
 		var msg = $(chat_input).val();
 
-		chat(JSONtoMsg({"author":"You","msg":msg}), chat_window);
+		chat(JSONtoHTML({"author":"You","msg":msg}), chat_window);
 		send(msg);
 
 		$(chat_input).val('');
@@ -91,7 +89,7 @@ $(document).ready(function () {
 			retries = 0;
 		}
 
-		chat(JSONtoMsg({author: 'The Autobots', msg: 'Enter a message below to chat.'}), chat_window);
+		chat(JSONtoHTML({author: 'The Autobots', msg: 'Enter a message below to chat.'}), chat_window);
 	});
 
 	// Aww they broke it :(
@@ -125,7 +123,7 @@ $(document).ready(function () {
 
 	// Log stuff the server sends us
 	Server.bind('message', function (payload) {
-		chat(JSONtoMsg(payload), chat_window);
+		chat(JSONtoHTML(payload), chat_window);
 	});
 
 	Server.connect();
