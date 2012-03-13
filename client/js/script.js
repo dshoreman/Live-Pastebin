@@ -7,6 +7,8 @@ function log (text) {
 function chat (msg, chat_window) {
 	var chatbox = $(chat_window);
 	chatbox.append((chatbox.val() ? "\n" : '') + msg);
+
+	chatbox.scrollTop(chatbox.height());
 }
 
 function send (text) {
