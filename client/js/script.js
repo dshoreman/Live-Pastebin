@@ -73,10 +73,10 @@ $(document).ready(function () {
 		e.preventDefault();
 
 		var msg = $(chat_input).val();
-
-		chat(JSONtoHTML({"author":"You","msg":msg}), chat_window);
-		send(msg);
-
+		if ($.trim(msg) != '') {
+			chat(JSONtoHTML({"author":"You","msg":msg}), chat_window);
+			send(msg);
+		}
 		$(chat_input).val('');
 	});
 
