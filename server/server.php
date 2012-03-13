@@ -18,8 +18,15 @@ function wsOnMessage($clientID, $message, $messageLength, $binary) {
 	}
 
 	//The speaker is the only person in the room. Don't let them feel lonely.
-	if (sizeof($Server->wsClients) == 1)
-		$Server->wsSend($clientID, '{"author":"The Autobots","msg":"There\'s nobody here, fool!"}');
+	if (sizeof($Server->wsClients) == 1) {
+		if ($Server->wsClients[$clientID]['data']['seenLonelyMsg'] === false) {
+			$Server->wsSend($clientID, json_encode(array(
+				'author' => 'The Autobots',
+				'msg' => 'There\'s nobody here, fool!'
+			)));
+			$Server->wsClients[$clientID]['data']['seenLonelyMsg'] = true;
+		}
+	}
 	else {
 		//Send the message to everyone but the person who said it
 		foreach ( $Server->wsClients as $id => $client ) {
@@ -38,6 +45,7 @@ function wsOnOpen($clientID) {
 	$ip = long2ip($Server->wsClients[$clientID][6]);
 
 	$Server->log($ip . ' (' . $clientID . ') has connected.');
+	$Server->wsClients[$clientID]['data'] = array('seenLonelyMsg' => false);
 
 	//Send a join notice to everyone but the person who joined
 	foreach ( $Server->wsClients as $id => $client ) {
