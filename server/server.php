@@ -17,24 +17,40 @@ function wsOnMessage($clientID, $message, $messageLength, $binary) {
 		return;
 	}
 
-	//The speaker is the only person in the room. Don't let them feel lonely.
-	if (sizeof($Server->wsClients) == 1) {
-		if ($Server->wsClients[$clientID]['data']['seenLonelyMsg'] === false) {
-			$Server->wsSend($clientID, json_encode(array(
-				'author' => 'The Autobots',
-				'msg' => 'There\'s nobody here, fool!'
-			)));
-			$Server->wsClients[$clientID]['data']['seenLonelyMsg'] = true;
+	if (substr($message, 0, 17) == '{SERVER[CODEBOX]}') {
+		// Update the codeboxes
+		if (sizeof($Server->wsClients) > 1) {
+			foreach ($Server->wsClients as $id => $client) {
+				if ($id == $clientID) continue;
+				$Server->wsSend($id, json_encode(array(
+					'destination' => 'codebox',
+					'content' => $message
+				)));
+			}
 		}
 	}
 	else {
-		//Send the message to everyone but the person who said it
-		foreach ( $Server->wsClients as $id => $client ) {
-			if ($id == $clientID) continue;
-			$Server->wsSend($id, json_encode(array(
-				'author' => 'User ' . $clientID,
-				'msg' => $message
-			)));
+		//The speaker is the only person in the room. Don't let them feel lonely.
+		if (sizeof($Server->wsClients) == 1) {
+			if ($Server->wsClients[$clientID]['data']['seenLonelyMsg'] === false) {
+				$Server->wsSend($clientID, json_encode(array(
+					'destination' => 'chatbox',
+					'author' => 'The Autobots',
+					'msg' => 'There\'s nobody here, fool!'
+				)));
+				$Server->wsClients[$clientID]['data']['seenLonelyMsg'] = true;
+			}
+		}
+		else {
+			//Send the message to everyone but the person who said it
+			foreach ( $Server->wsClients as $id => $client ) {
+				if ($id == $clientID) continue;
+				$Server->wsSend($id, json_encode(array(
+					'destination' => 'chatbox',
+					'author' => 'User ' . $clientID,
+					'msg' => $message
+				)));
+			}
 		}
 	}
 }

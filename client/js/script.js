@@ -54,6 +54,7 @@ $(document).ready(function () {
 	var chat_window = '#chatWindow';
 	var chat_form = '#chatForm';
 	var chat_input = '#chatForm input';
+	var code_box = '#codeBox';
 
 	function JSONtoHTML (JSON) {
 		if (typeof JSON == 'string') var data = $.parseJSON(JSON);
@@ -78,6 +79,11 @@ $(document).ready(function () {
 			send(msg);
 		}
 		$(chat_input).val('');
+	});
+
+	// Keep the code box sync'd
+	$(code_box).keypress(function (e) {
+		send('{SERVER[CODEBOX]}' + $(this).val());
 	});
 
 	// Socket open - we're in!

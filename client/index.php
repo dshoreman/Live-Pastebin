@@ -39,7 +39,7 @@
 					<div class="row-fluid">
 						<div class="span12">
 							<div class="well">
-								<pre>code goes here</pre>
+								<textarea class="input-xxlarge" id="codeBox" rows="30"></textarea>
 							</div>
 						</div>
 					</div>
