@@ -11,8 +11,8 @@ function chat (msg, chat_window) {
 	chatbox.scrollTop(chatbox.height());
 }
 
-function send (text) {
-	Server.send('message', text);
+function send (data, destination) {
+	Server.send('message', '{"data":"' + data + '","dest":"' + destination + '"}');
 }
 
 function setStatus (status, msg) {
@@ -76,14 +76,14 @@ $(document).ready(function () {
 		var msg = $(chat_input).val();
 		if ($.trim(msg) != '') {
 			chat(JSONtoHTML({"author":"You","msg":msg}), chat_window);
-			send(msg);
+			send(msg, 'chatWindow');
 		}
 		$(chat_input).val('');
 	});
 
 	// Keep the code box sync'd
 	$(code_box).keypress(function (e) {
-		send('{SERVER[CODEBOX]}' + $(this).val());
+		send($(code_box).val(), 'codeBox');
 	});
 
 	// Socket open - we're in!
@@ -131,7 +131,12 @@ $(document).ready(function () {
 
 	// Log stuff the server sends us
 	Server.bind('message', function (payload) {
-		chat(JSONtoHTML(payload), chat_window);
+		// We want to parse the JSON here so we can decide what to do based on code/chat
+		var data = $.parseJSON(payload)
+		switch (data.dest) {
+			case 'codeBox': $(code_box).val(data.data); break;
+			case 'chatWindow': chat(JSONtoHTML(data), chat_window); break;
+		}
 	});
 
 	Server.connect();

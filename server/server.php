@@ -17,40 +17,29 @@ function wsOnMessage($clientID, $message, $messageLength, $binary) {
 		return;
 	}
 
-	if (substr($message, 0, 17) == '{SERVER[CODEBOX]}') {
-		// Update the codeboxes
-		if (sizeof($Server->wsClients) > 1) {
-			foreach ($Server->wsClients as $id => $client) {
-				if ($id == $clientID) continue;
-				$Server->wsSend($id, json_encode(array(
-					'destination' => 'codebox',
-					'content' => $message
-				)));
+	$message_o = json_decode($message);
+	switch ($message_o->dest) {
+		case 'codeBox': sendForAllButMe($clientID, $message); break;
+		case 'chatWindow': {
+			//The speaker is the only person in the room. Don't let them feel lonely.
+			if (sizeof($Server->wsClients) == 1) {
+				if ($Server->wsClients[$clientID]['data']['seenLonelyMsg'] === false) {
+					$Server->wsSend($clientID, json_encode(array(
+						'dest' => $message_o->chatWindow,
+						'author' => 'The Autobots',
+						'msg' => 'There\'s nobody here, fool!'
+					)));
+					$Server->wsClients[$clientID]['data']['seenLonelyMsg'] = true;
+				}
 			}
-		}
-	}
-	else {
-		//The speaker is the only person in the room. Don't let them feel lonely.
-		if (sizeof($Server->wsClients) == 1) {
-			if ($Server->wsClients[$clientID]['data']['seenLonelyMsg'] === false) {
-				$Server->wsSend($clientID, json_encode(array(
-					'destination' => 'chatbox',
-					'author' => 'The Autobots',
-					'msg' => 'There\'s nobody here, fool!'
-				)));
-				$Server->wsClients[$clientID]['data']['seenLonelyMsg'] = true;
-			}
-		}
-		else {
-			//Send the message to everyone but the person who said it
-			foreach ( $Server->wsClients as $id => $client ) {
-				if ($id == $clientID) continue;
-				$Server->wsSend($id, json_encode(array(
-					'destination' => 'chatbox',
+			else {
+				sendForAllButMe($clientID, json_encode(array(
+					'dest' => $message_o->dest,
 					'author' => 'User ' . $clientID,
-					'msg' => $message
+					'msg' => $message_o->data
 				)));
 			}
+			break;
 		}
 	}
 }
@@ -67,6 +56,7 @@ function wsOnOpen($clientID) {
 	foreach ( $Server->wsClients as $id => $client ) {
 		if ($id == $clientID) continue;
 		$Server->wsSend($id, json_encode(array(
+			'dest' => 'chatWindow',
 			'author' => 'The Autobots',
 			'msg' => 'User ' . $clientID . ' (' . $ip . ') has joined the room.'
 		)));
@@ -82,9 +72,22 @@ function wsOnClose($clientID, $status) {
 
 	foreach ( $Server->wsClients as $id => $client ) {
 		$Server->wsSend($id, json_encode(array(
+			'dest' => 'chatWindow',
 			'author' => 'The Autobots',
 			'msg' => 'User ' . $clientID . ' (' . $ip . ') has left the room.'
 		)));
+	}
+}
+
+// Send a message to everyone except the one sending it
+function sendForAllButMe ($me, $data) {
+	global $Server;
+
+	if (sizeof($Server->wsClients) > 1) {
+		foreach ($Server->wsClients as $id => $client) {
+			if ($id == $me) continue;
+			$Server->wsSend($id, $data);
+		}
 	}
 }
 
