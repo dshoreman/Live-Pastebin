@@ -1,9 +1,5 @@
 var Server;
 
-function log (text) {
-	console.log(text);
-}
-
 function chat (msg, chat_window) {
 	var chatbox = $(chat_window);
 	chatbox.append((chatbox.val() ? "\n" : '') + msg);
@@ -66,7 +62,7 @@ $(document).ready(function () {
 
 	// Make the connection
 	setStatus('connecting');
-	log('Connecting...');
+	console.log('INFO', 'Connecting...');
 	Server = new FancyWebSocket('ws://127.0.0.1:9300');
 
 	// Process the user's chat messages
@@ -89,11 +85,11 @@ $(document).ready(function () {
 	// Socket open - we're in!
 	Server.bind('open', function () {
 		setStatus('connected');
-		log('Connected.');
+		console.log('INFO', 'Connected.');
 		connected = true;
 
 		if (retries > 0) {
-			log('Resetting retry count...');
+			console.log('INFO', 'Resetting retry count...');
 			retries = 0;
 		}
 
@@ -108,14 +104,14 @@ $(document).ready(function () {
 				retries++;
 				if (retries <= max_retries) {
 					setStatus('connecting', 'reconnecting (attempt ' + retries + ' of ' + max_retries + ')...');
-					log('reconnecting (attempt ' + retries + ' of ' + max_retries + ')...');
+					console.log('INFO,' 'Reconnecting (attempt ' + retries + ' of ' + max_retries + ')...');
 
 					setTimeout(function () {
 						Server.connect();
 					}, retry_time);
 				}
 				else {
-					log('max retries reached, aborting.');
+					console.log('INFO', 'Max retries reached, aborting.');
 					setStatus('disconnected');
 					connected = false;
 				}
@@ -124,7 +120,7 @@ $(document).ready(function () {
 		else {
 			setTimeout(function () {
 				setStatus('disconnected');
-				log('Disconnected.');
+				console.log('INFO', 'Disconnected.');
 			}, 1500);
 		}
 	});
