@@ -79,7 +79,35 @@ $(document).ready(function () {
 
 	// Keep the code box sync'd
 	$(code_box).keyup(function (e) {
-		send($(code_box).val(), 'codeBox');
+		var key = e.which;
+		// Shift, ctrl, arrow keys etc.. Stuff we don't need, basically.
+		if (key != 32 && (key > 15 && key < 46) || (key > 111 && key < 146)) return;
+
+		var caretpos = $(code_box).prop('selectionStart') - 1;
+		var sendkey = '?';
+		var chars = $(code_box).val().split('');
+
+		// Space, 0-9A-Z, Numpad0-9
+		// TODO: Check for other 'special' chars. Move this into a separate function.
+		if (key == 32 || (key >= 48 && key <= 90) || (key >= 96 && key <= 111)) {
+			action = 'addChar';
+			sendkey = chars[caretpos];
+		}
+		else if (key == 8) {
+			action = 'delChar';
+
+		}
+		else action = false;
+
+		if (action) {
+			send($.param({
+				action: action,
+				key: sendkey,
+				pos: caretpos,
+				which: e.which
+			}), 'codeBox');
+		}
+		console.log('SEND', 'pos', caretpos, 'box.length', $(code_box).val().length, 'which', e.which, chars);
 	});
 
 	// Socket open - we're in!
@@ -104,7 +132,7 @@ $(document).ready(function () {
 				retries++;
 				if (retries <= max_retries) {
 					setStatus('connecting', 'reconnecting (attempt ' + retries + ' of ' + max_retries + ')...');
-					console.log('INFO,' 'Reconnecting (attempt ' + retries + ' of ' + max_retries + ')...');
+					console.log('INFO', 'Reconnecting (attempt ' + retries + ' of ' + max_retries + ')...');
 
 					setTimeout(function () {
 						Server.connect();
@@ -127,10 +155,23 @@ $(document).ready(function () {
 
 	// Log stuff the server sends us
 	Server.bind('message', function (payload) {
-		// We want to parse the JSON here so we can decide what to do based on code/chat
-		var data = $.parseJSON(payload)
+		var chars = $(code_box).val().split('');
+		var data = $.parseJSON(payload);
+		var e = $.deparam(data.data);
+
 		switch (data.dest) {
-			case 'codeBox': $(code_box).val(data.data); break;
+			case 'codeBox':
+				switch(e.action) {
+					case 'addChar': {
+						for (var i = chars.length; i > e.pos; i--) {
+							chars[i] = chars[i-1];
+						}
+						chars[e.pos] = e.key;
+						$('#' + data.dest).val(chars.join(''));
+					}
+				}
+				console.log('RECV', e, chars);
+				break;
 			case 'chatWindow': chat(JSONtoHTML(data), chat_window); break;
 		}
 	});

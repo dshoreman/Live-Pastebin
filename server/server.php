@@ -36,7 +36,7 @@ function wsOnMessage($clientID, $message, $messageLength, $binary) {
 				sendForAllButMe($clientID, json_encode(array(
 					'dest' => $message_o->dest,
 					'author' => 'User ' . $clientID,
-					'msg' => $message_o->data
+					'msg' => json_encode($message_o->data)
 				)));
 			}
 			break;

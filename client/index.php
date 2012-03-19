@@ -71,6 +71,8 @@
 
 		<script src="js/libs/fancywebsocket.js"></script>
 
+		<script src="js/libs/jquery-bbq-1.3pre.min.js"></script>
+		<script src="js/libs/jquery-caret.js"></script>
 		<script src="js/script.js"></script>
 	</body>
 </html>
