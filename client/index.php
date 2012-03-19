@@ -11,7 +11,7 @@
 		<meta name="viewport" content="width=device-width">
 
 		<link rel="stylesheet/less" href="less/style.less">
-		<script src="js/libs/less-1.2.1.min.js"></script>
+		<script src="js/libs/less-1.3.0.min.js"></script>
 
 		<script src="js/libs/modernizr-2.5.3-respond-1.1.0.min.js"></script>
 	</head>
