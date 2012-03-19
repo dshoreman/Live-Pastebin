@@ -2,7 +2,7 @@
 set_time_limit(0);
 @date_default_timezone_set('Europe/London');
 
-$server_host = '192.168.1.72';//127.0.0.1';
+$server_host = '127.0.0.1';
 $server_port = 9300;
 
 require 'class.PHPWebSocket.php';
