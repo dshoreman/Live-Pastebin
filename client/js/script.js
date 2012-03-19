@@ -78,7 +78,7 @@ $(document).ready(function () {
 	});
 
 	// Keep the code box sync'd
-	$(code_box).keypress(function (e) {
+	$(code_box).keyup(function (e) {
 		send($(code_box).val(), 'codeBox');
 	});
 
