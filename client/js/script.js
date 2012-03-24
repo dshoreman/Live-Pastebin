@@ -1,4 +1,5 @@
 var Server;
+var eFromRemote = false;
 
 function chat (msg, chat_window) {
 	var chatbox = $(chat_window);
@@ -8,7 +9,10 @@ function chat (msg, chat_window) {
 }
 
 function send (data, destination) {
-	Server.send('message', '{"data":"' + data + '","dest":"' + destination + '"}');
+	if (eFromRemote == false)
+		Server.send('message', '{"data":"' + data + '","dest":"' + destination + '"}');
+	else // Reset eFromRemote if it was so that the next local event will be sent
+		eFromRemote = false;
 }
 
 function setStatus (status, msg) {
@@ -52,6 +56,11 @@ $(document).ready(function () {
 	var chat_input = '#chatForm input';
 	var code_box = '#codeBox';
 
+	var editor = ace.edit('codeBox');
+	editor.setTheme('ace/theme/monokai');
+	var phpMode = require('ace/mode/php').Mode;
+	editor.getSession().setMode(new phpMode());
+
 	function JSONtoHTML (JSON) {
 		if (typeof JSON == 'string') var data = $.parseJSON(JSON);
 		else if (typeof JSON == 'object') var data = JSON;
@@ -78,36 +87,14 @@ $(document).ready(function () {
 	});
 
 	// Keep the code box sync'd
-	$(code_box).keyup(function (e) {
-		var key = e.which;
-		// Shift, ctrl, arrow keys etc.. Stuff we don't need, basically.
-		if (key != 32 && (key > 15 && key < 46) || (key > 111 && key < 146)) return;
-
-		var caretpos = $(code_box).prop('selectionStart') - 1;
-		var sendkey = '?';
-		var chars = $(code_box).val().split('');
-
-		// Space, 0-9A-Z, Numpad0-9
-		// TODO: Check for other 'special' chars. Move this into a separate function.
-		if (key == 32 || (key >= 48 && key <= 90) || (key >= 96 && key <= 111)) {
-			action = 'addChar';
-			sendkey = chars[caretpos];
-		}
-		else if (key == 8) {
-			action = 'delChar';
-
-		}
-		else action = false;
-
-		if (action) {
-			send($.param({
-				action: action,
-				key: sendkey,
-				pos: caretpos,
-				which: e.which
-			}), 'codeBox');
-		}
-		console.log('SEND', 'pos', caretpos, 'box.length', $(code_box).val().length, 'which', e.which, chars);
+	editor.getSession().on('change', function(e) {
+		console.log('SEND', e);
+		send($.param({
+			action: e.data.action,
+			key: e.data.text,
+			line: e.data.range.start.row,
+			column: e.data.range.start.column
+		}), 'codeBox');
 	});
 
 	// Socket open - we're in!
@@ -155,22 +142,20 @@ $(document).ready(function () {
 
 	// Log stuff the server sends us
 	Server.bind('message', function (payload) {
-		var chars = $(code_box).val().split('');
 		var data = $.parseJSON(payload);
 		var e = $.deparam(data.data);
 
 		switch (data.dest) {
 			case 'codeBox':
+				console.log('RECV', e);
 				switch(e.action) {
-					case 'addChar': {
-						for (var i = chars.length; i > e.pos; i--) {
-							chars[i] = chars[i-1];
-						}
-						chars[e.pos] = e.key;
-						$('#' + data.dest).val(chars.join(''));
+					case 'insertText': {
+						eFromRemote = true;
+						editor.moveCursorTo(e.line, e.column);
+						editor.insert(e.key);
+						break;
 					}
 				}
-				console.log('RECV', e, chars);
 				break;
 			case 'chatWindow': chat(JSONtoHTML(data), chat_window); break;
 		}

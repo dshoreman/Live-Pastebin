@@ -21,11 +21,6 @@
 		<div class="navbar navbar-fixed-top">
 			<div class="navbar-inner">
 				<div class="container">
-					<a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-						<span class="icon-bar"></span>
-						<span class="icon-bar"></span>
-						<span class="icon-bar"></span>
-					</a>
 					<a class="brand" href="#">Live Pastebin</a>
 				</div>
 			</div>
@@ -38,9 +33,7 @@
 					<p class="pull-right"><a class="btn btn-large" id="socket_status">offline</a></p>
 					<div class="row-fluid">
 						<div class="span12">
-							<div class="well">
-								<textarea class="input-xxlarge" id="codeBox" style="height: 495px; margin-bottom: 0;"></textarea>
-							</div>
+							<div class="input-xxlarge" id="codeBox" style="height: 495px; margin-bottom: 0; width: 740px;"></div>
 						</div>
 					</div>
 				</div>
@@ -73,6 +66,9 @@
 
 		<script src="js/libs/jquery-bbq-1.3pre.min.js"></script>
 		<script src="js/libs/jquery-caret.js"></script>
+		<script src="js/libs/ace/ace.js"></script>
+		<script src="js/libs/ace/theme-monokai.js"></script>
+		<script src="js/libs/ace/mode-php.js"></script>
 		<script src="js/script.js"></script>
 	</body>
 </html>
