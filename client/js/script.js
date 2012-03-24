@@ -143,10 +143,10 @@ $(document).ready(function () {
 	// Log stuff the server sends us
 	Server.bind('message', function (payload) {
 		var data = $.parseJSON(payload);
-		var e = $.deparam(data.data);
 
 		switch (data.dest) {
 			case 'codeBox':
+				var e = $.deparam(data.data);
 				console.log('RECV', e);
 				switch(e.action) {
 					case 'insertText': {
