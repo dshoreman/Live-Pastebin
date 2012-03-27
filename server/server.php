@@ -2,8 +2,10 @@
 set_time_limit(0);
 @date_default_timezone_set('Europe/London');
 
-$server_host = '127.0.0.1';
-$server_port = 9300;
+if (file_exists(dirname(dirname(__FILE__)) . '/config.php'))
+	$config = require_once(dirname(dirname(__FILE__)) . '/config.php');
+else
+	die('Fatal error: Failed to find config.php in' . "\n\t" . dirname(dirname(__FILE__)));
 
 require 'class.PHPWebSocket.php';
 
@@ -93,9 +95,9 @@ function sendForAllButMe ($me, $data) {
 
 // start the server
 $Server = new PHPWebSocket();
-$Server->log('Starting pasted...');
+$Server->log('Starting pasted on ' . $config['server_host'] . ':' . $config['server_port'] . '...');
 $Server->bind('message', 'wsOnMessage');
 $Server->bind('open', 'wsOnOpen');
 $Server->bind('close', 'wsOnClose');
 
-$Server->wsStartServer($server_host, $server_port);
+$Server->wsStartServer($config['server_host'], $config['server_port']);
