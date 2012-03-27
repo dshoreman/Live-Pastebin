@@ -93,7 +93,9 @@ $(document).ready(function () {
 			action: e.data.action,
 			key: e.data.text,
 			line: e.data.range.start.row,
-			column: e.data.range.start.column
+			column: e.data.range.start.column,
+			endRow: e.data.range.end.row,
+			endCol: e.data.range.end.column
 		}), 'codeBox');
 	});
 
@@ -153,6 +155,14 @@ $(document).ready(function () {
 						eFromRemote = true;
 						editor.moveCursorTo(e.line, e.column);
 						editor.insert(e.key);
+						break;
+					}
+					case 'removeText': {
+						eFromRemote = true;
+						//editor.moveCursorTo(e.line, e.column-1);
+						//editor.getSession().getSelection().selectTo(e.endRow, e.endCol);
+
+						editor.getSession().getDocument().removeInLine(e.line, e.column, e.endCol);
 						break;
 					}
 				}
