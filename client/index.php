@@ -30,7 +30,7 @@
 			<div class="row-fluid">
 				<div class="span8">
 					<h2 class="pull-left">Untitled Paste</h2>
-					<p class="pull-right"><a class="btn btn-large" id="socket_status">offline</a></p>
+					<p class="pull-right"><a class="btn btn-large disabled" id="socket_status">offline</a></p>
 					<div class="row-fluid">
 						<div class="span12">
 							<div class="input-xxlarge" id="codeBox" style="height: 495px; margin-bottom: 0; width: 740px;"></div>
